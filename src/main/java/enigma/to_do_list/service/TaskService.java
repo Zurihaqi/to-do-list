@@ -16,5 +16,5 @@ public interface TaskService {
 
     void delete(Integer id);
 
-    void completeTask(Integer id);
+    void toggleCompletion(Integer id);
 }

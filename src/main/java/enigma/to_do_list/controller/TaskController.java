@@ -48,9 +48,12 @@ public class TaskController {
         return Response.renderJson("task deleted", HttpStatus.OK);
     }
 
-    @PostMapping("/complete-task/{id}")
-    public ResponseEntity<?> completeTask(@PathVariable Integer id){
-        taskService.completeTask(id);
-        return Response.renderJson("task with id " + id + " completed", HttpStatus.OK);
+    @PostMapping("/toggle-completion/{id}")
+    public ResponseEntity<?> toggleCompletion(@PathVariable Integer id){
+        taskService.toggleCompletion(id);
+        return Response.renderJson(
+                taskService.getById(id).isCompleted() ? "task with id " + id + ": set completed" : "task with id " + id + ": set incomplete",
+                HttpStatus.OK
+        );
     }
 }

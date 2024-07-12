@@ -68,12 +68,16 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     @Override
-    public void completeTask(Integer id) {
+    public void toggleCompletion(Integer id) {
         if(!taskRepository.existsById(id)) throw new RuntimeException("task with id " + id + " not found");
         Task task = getById(id);
 
-        task.setCompleted(true);
-        task.setCompletedAt(new Date());
+        task.setCompleted(!task.isCompleted());
+        if (task.isCompleted()) {
+            task.setCompletedAt(new Date());
+        } else {
+            task.setCompletedAt(null);
+        }
 
         taskRepository.save(task);
     }
