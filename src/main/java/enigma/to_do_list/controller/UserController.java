@@ -25,6 +25,7 @@ public class UserController {
 
         if(request.getName() != null) userService.updateName(id, request.getName());
         if(request.getEmail() != null) userService.updateEmail(id, request.getEmail());
+        if(request.getPassword() != null) userService.updatePassword(id, request.getPassword());
 
         return Response.renderJson(userService.getById(id), "user updated", HttpStatus.OK);
     }
