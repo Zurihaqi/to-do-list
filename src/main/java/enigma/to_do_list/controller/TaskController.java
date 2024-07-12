@@ -20,13 +20,13 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody TaskDto request){
+    public ResponseEntity<?> create(@RequestBody TaskDto.request request){
         return Response.renderJson(taskService.create(request), "task created", HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     @Validated
-    public ResponseEntity<?> update(@PathVariable Integer id, @Valid @RequestBody TaskDto request){
+    public ResponseEntity<?> update(@PathVariable Integer id, @Valid @RequestBody TaskDto.request request){
         if(request.getTask() == null) throw new RuntimeException("task cannot be empty");
 
         return Response.renderJson(taskService.update(id, request), "task updated", HttpStatus.OK);
@@ -52,7 +52,11 @@ public class TaskController {
     public ResponseEntity<?> toggleCompletion(@PathVariable Integer id){
         taskService.toggleCompletion(id);
         return Response.renderJson(
-                taskService.getById(id).isCompleted() ? "task with id " + id + ": set completed" : "task with id " + id + ": set incomplete",
+                taskService.getById(id).isCompleted()
+                        ?
+                        "task with id " + id + ": set completed"
+                        :
+                        "task with id " + id + ": set incomplete",
                 HttpStatus.OK
         );
     }

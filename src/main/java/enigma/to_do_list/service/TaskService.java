@@ -6,13 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface TaskService {
-    Task create(TaskDto task);
+    TaskDto.response create(TaskDto.request task);
 
-    Task update(Integer id, TaskDto task);
+    TaskDto.response update(Integer id, TaskDto.request task);
 
     Page<Task> getAll(Pageable pageable);
 
-    Task getById(Integer id);
+    TaskDto.response getById(Integer id);
 
     void delete(Integer id);
 

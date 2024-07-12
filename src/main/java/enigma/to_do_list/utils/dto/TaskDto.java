@@ -1,14 +1,26 @@
 package enigma.to_do_list.utils.dto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-@Getter
-@Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+import java.util.Date;
+
 public class TaskDto {
-    private Integer user_id;
-    private String task;
+
+    @Getter
+    @Setter
+    public static class request {
+        private Integer user_id;
+        private String task;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class response {
+        private Integer user_id;
+        private String task;
+        private boolean completed;
+        private Date createdAt;
+        private Date completedAt;
+    }
 }

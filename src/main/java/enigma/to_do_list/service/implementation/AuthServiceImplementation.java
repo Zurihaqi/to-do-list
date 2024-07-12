@@ -65,7 +65,7 @@ public class AuthServiceImplementation implements AuthService {
         }
 
         return AuthenticationResponse.builder()
-                .token(jwtService.generateToken((UserDetails) user))
+                .token(jwtService.generateToken(user))
                 .build();
     }
 }

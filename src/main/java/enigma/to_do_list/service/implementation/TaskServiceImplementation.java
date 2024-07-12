@@ -20,12 +20,12 @@ public class TaskServiceImplementation implements TaskService {
     private final UserRepository userRepository;
 
     @Override
-    public Task create(TaskDto task) {
+    public TaskDto.response create(TaskDto.request task) {
         User user = userRepository.findById(task.getUser_id()).orElseThrow(() -> new RuntimeException("user with id " + task.getUser_id() + " cannot be found"));
         if(task.getUser_id() == null) throw new RuntimeException("user_id cannot be empty");
         if(task.getTask() == null || task.getTask().isEmpty() || task.getTask().isBlank()) throw new RuntimeException("task cannot be empty");
 
-        return taskRepository.save(Task.builder()
+        Task newTask = taskRepository.save(Task.builder()
                 .user(user)
                 .task(task.getTask())
                 .createdAt(new Date())
@@ -33,10 +33,18 @@ public class TaskServiceImplementation implements TaskService {
                 .completedAt(null)
                 .build()
         );
+
+        return TaskDto.response.builder()
+                .task(newTask.getTask())
+                .user_id(newTask.getUser().getId())
+                .createdAt(newTask.getCreatedAt())
+                .completedAt(newTask.getCompletedAt())
+                .completed(newTask.isCompleted())
+                .build();
     }
 
     @Override
-    public Task update(Integer id, TaskDto task) {
+    public TaskDto.response update(Integer id, TaskDto.request task) {
         Task newTask = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " doesn't exist"));
 
         if(task.getUser_id() != null){
@@ -48,7 +56,15 @@ public class TaskServiceImplementation implements TaskService {
         if(task.getTask() == null || task.getTask().isEmpty() || task.getTask().isBlank()) throw new RuntimeException("task cannot be empty");
         newTask.setTask(task.getTask());
 
-        return taskRepository.save(newTask);
+        taskRepository.save(newTask);
+
+        return TaskDto.response.builder()
+                .task(newTask.getTask())
+                .user_id(newTask.getUser().getId())
+                .createdAt(newTask.getCreatedAt())
+                .completedAt(newTask.getCompletedAt())
+                .completed(newTask.isCompleted())
+                .build();
     }
 
     @Override
@@ -57,8 +73,15 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     @Override
-    public Task getById(Integer id) {
-        return taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " not found"));
+    public TaskDto.response getById(Integer id) {
+        Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " not found"));
+        return TaskDto.response.builder()
+                .task(task.getTask())
+                .user_id(task.getUser().getId())
+                .createdAt(task.getCreatedAt())
+                .completedAt(task.getCompletedAt())
+                .completed(task.isCompleted())
+                .build();
     }
 
     @Override
@@ -69,8 +92,7 @@ public class TaskServiceImplementation implements TaskService {
 
     @Override
     public void toggleCompletion(Integer id) {
-        if(!taskRepository.existsById(id)) throw new RuntimeException("task with id " + id + " not found");
-        Task task = getById(id);
+        Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " not found"));
 
         task.setCompleted(!task.isCompleted());
         if (task.isCompleted()) {
