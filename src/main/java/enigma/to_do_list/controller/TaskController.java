@@ -48,7 +48,7 @@ public class TaskController {
         return Response.renderJson("task deleted", HttpStatus.OK);
     }
 
-    @PostMapping("/toggle-completion/{id}")
+    @PatchMapping("/toggle-completion/{id}")
     public ResponseEntity<?> toggleCompletion(@PathVariable Integer id){
         taskService.toggleCompletion(id);
         return Response.renderJson(
