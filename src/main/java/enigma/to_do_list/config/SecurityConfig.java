@@ -41,19 +41,19 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public AuthorizationManager<RequestAuthorizationContext> userAuthorizationManager() {
-        AuthorizationManager<RequestAuthorizationContext> adminAuth = AuthorityAuthorizationManager.hasRole("ADMIN");
-        return (authentication, context) -> {
-            if (adminAuth.check(authentication, context).isGranted()) {
-                return new AuthorizationDecision(true);
-            }
-            try {
-                int userId = Integer.parseInt(context.getVariables().get("id"));
-                return new AuthorizationDecision(userSecurity.isUser(authentication.get(), userId));
-            } catch (NumberFormatException e) {
-                return new AuthorizationDecision(false);
-            }
-        };
-    }
+//    @Bean
+//    public AuthorizationManager<RequestAuthorizationContext> userAuthorizationManager() {
+//        AuthorizationManager<RequestAuthorizationContext> adminAuth = AuthorityAuthorizationManager.hasRole("ADMIN");
+//        return (authentication, context) -> {
+//            if (adminAuth.check(authentication, context).isGranted()) {
+//                return new AuthorizationDecision(true);
+//            }
+//            try {
+//                int userId = Integer.parseInt(context.getVariables().get("id"));
+//                return new AuthorizationDecision(userSecurity.isUser(authentication.get(), userId));
+//            } catch (NumberFormatException e) {
+//                return new AuthorizationDecision(false);
+//            }
+//        };
+//    }
 }
