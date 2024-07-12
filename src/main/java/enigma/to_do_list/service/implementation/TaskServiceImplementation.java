@@ -47,10 +47,9 @@ public class TaskServiceImplementation implements TaskService {
     public TaskDto.response update(Integer id, TaskDto.request task) {
         Task newTask = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " doesn't exist"));
 
+        // Update user is optional
         if(task.getUser_id() != null){
-            boolean userExist = userRepository.existsById(task.getUser_id());
-            if(!userExist) throw new RuntimeException("user with id " + task.getUser_id() + " doesn't exist");
-            task.setUser_id(task.getUser_id());
+            newTask.setUser(userRepository.findById(task.getUser_id()).orElseThrow(() -> new RuntimeException("user with id " + task.getUser_id() + " doesn't exist")));
         }
 
         if(task.getTask() == null || task.getTask().isEmpty() || task.getTask().isBlank()) throw new RuntimeException("task cannot be empty");
