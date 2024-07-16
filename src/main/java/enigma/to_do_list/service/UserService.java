@@ -5,11 +5,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface UserService {
-    User updateName(Integer id, String name);
+    void updateName(Integer id, String name);
 
-    User updateEmail(Integer id, String email);
+    void updateEmail(Integer id, String email);
 
-    User updatePassword(Integer id, String password);
+    void updatePassword(Integer id, String password);
 
     Page<User> getAll(Pageable pageable);
 

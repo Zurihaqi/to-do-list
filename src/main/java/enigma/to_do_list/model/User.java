@@ -25,6 +25,7 @@ public class User implements UserDetails {
     @JsonIgnore
     private String password;
     private String name;
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -35,4 +36,9 @@ public class User implements UserDetails {
     public String getUsername() {
         return this.email;
     }
+
+    public static enum Role {
+        USER,
+        ADMIN
+    };
 }

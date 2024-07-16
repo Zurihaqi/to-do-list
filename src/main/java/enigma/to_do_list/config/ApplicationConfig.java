@@ -23,7 +23,7 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return email -> (UserDetails) repository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("invalid or expired token"));
+                .orElseThrow(() -> new RuntimeException("user not found (UserDetailsService)"));
     }
 
     @Bean

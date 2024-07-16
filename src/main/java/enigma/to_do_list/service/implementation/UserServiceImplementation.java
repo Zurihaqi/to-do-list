@@ -18,17 +18,17 @@ public class UserServiceImplementation implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public User updateName(Integer id, String name) {
+    public void updateName(Integer id, String name) {
         User user = getById(id);
 
         if(name == null || name.isEmpty() || name.isBlank()) throw new RuntimeException("name cannot be empty");
 
         user.setName(name);
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     @Override
-    public User updateEmail(Integer id, String email) {
+    public void updateEmail(Integer id, String email) {
         User user = getById(id);
 
         if(email == null || email.isEmpty() || email.isBlank()) throw new RuntimeException("email cannot be empty");
@@ -39,18 +39,18 @@ public class UserServiceImplementation implements UserService {
 
         user.setEmail(email);
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     @Override
-    public User updatePassword(Integer id, String password) {
+    public void updatePassword(Integer id, String password) {
         User user = getById(id);
 
         if(password == null || password.isBlank() || password.isEmpty()) throw new RuntimeException("password cannot be empty");
 
         user.setPassword(passwordEncoder.encode(password));
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     @Override
