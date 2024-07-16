@@ -38,7 +38,7 @@ public class AuthServiceImplementation implements AuthService {
                 .email(request.getEmail())
                 .name(request.getName())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(User.Role.USER)
+                .role(User.Role.ROLE_USER)
                 .build();
 
         User savedUser = userRepository.save(user);
