@@ -17,6 +17,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
 
@@ -33,16 +36,17 @@ public class TaskServiceImplementation implements TaskService {
         if(task.getDueDate() == null) throw new RuntimeException("dueDate cannot be empty");
         if(task.getDescription() == null || task.getDescription().isEmpty() || task.getDescription().isBlank()) throw new RuntimeException("description cannot be empty");
 
-        Date validDueDate = Date.from(task.getDueDate());
-        if(validDueDate.before(new Date())) throw new RuntimeException("due date must be in the future");
+        // Add "Z" at the end of the string and convert to OffsetDateTime
+        OffsetDateTime validDueDate = OffsetDateTime.parse(task.getDueDate() + "Z");
+        if(validDueDate.isBefore(OffsetDateTime.now())) throw new RuntimeException("due date must be in the future");
 
         Task newTask = taskRepository.save(Task.builder()
                 .user(user)
                 .title(task.getTitle())
                 .description(task.getDescription())
-                .createdAt(new Date())
+                .createdAt(OffsetDateTime.now())
                 .status(Task.Status.PENDING)
-                .dueDate(Date.from(task.getDueDate()))
+                .dueDate(validDueDate)
                 .build()
         );
 
@@ -63,7 +67,7 @@ public class TaskServiceImplementation implements TaskService {
 
         if(task.getTitle() != null && !task.getTitle().isEmpty() && !task.getTitle().isBlank()) newTask.setTitle(task.getTitle());
         if(task.getStatus() != null) newTask.setStatus(task.getStatus());
-        if(task.getDueDate() != null) newTask.setDueDate(Date.from(task.getDueDate()));
+        if(task.getDueDate() != null) newTask.setDueDate(OffsetDateTime.parse(task.getDueDate() + "Z"));
         if(task.getDescription() != null && !task.getDescription().isEmpty() && !task.getDescription().isBlank()) newTask.setDescription(task.getDescription());
 
         taskRepository.save(newTask);

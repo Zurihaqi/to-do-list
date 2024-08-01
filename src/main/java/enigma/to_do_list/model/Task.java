@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "tasks")
@@ -20,10 +21,10 @@ public class Task {
     private String title;
     private Status status;
     private String description;
-    @Temporal(TemporalType.DATE)
-    private Date createdAt;
-    @Temporal(TemporalType.DATE)
-    private Date dueDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private OffsetDateTime createdAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    private OffsetDateTime dueDate;
 
     @JsonIgnore
     @ManyToOne
