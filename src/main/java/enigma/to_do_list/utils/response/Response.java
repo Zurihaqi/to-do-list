@@ -36,7 +36,7 @@ public class Response {
         WebResponseError<T> response = WebResponseError.<T>builder()
                 .message(message)
                 .status(httpStatus.getReasonPhrase())
-                .error(ex.getMessage())
+                .error(ex.toString())
                 .build();
         return ResponseEntity.status(httpStatus).body(response);
     }

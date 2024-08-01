@@ -23,7 +23,7 @@ public class AuthController {
             @RequestBody RegisterRequest request
     ) {
         String validEmailFormat = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
-        if (!request.getEmail().matches(validEmailFormat)) {
+        if (request.getEmail() != null && !request.getEmail().matches(validEmailFormat)) {
             throw new RuntimeException("Invalid email format");
         }
 
@@ -35,7 +35,7 @@ public class AuthController {
             @RequestBody AuthenticationRequest request
     ) {
         String validEmailFormat = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
-        if (!request.getEmail().matches(validEmailFormat)) {
+        if (request.getEmail() != null && !request.getEmail().matches(validEmailFormat)) {
             throw new RuntimeException("Invalid email format");
         }
 

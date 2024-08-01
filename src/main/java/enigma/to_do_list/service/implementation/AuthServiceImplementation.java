@@ -32,13 +32,13 @@ public class AuthServiceImplementation implements AuthService {
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
+        if(request.getEmail() == null || request.getEmail().isEmpty() || request.getEmail().isBlank()) throw new RuntimeException("email cannot be empty");
+        if(request.getUsername() == null || request.getUsername().isEmpty() || request.getUsername().isBlank()) throw new RuntimeException("username cannot be empty");
+        if(request.getPassword() == null || request.getPassword().isEmpty() || request.getPassword().isBlank()) throw new RuntimeException("password cannot be empty");
+        if(request.getPassword().length() < 8) throw new RuntimeException("password too short");
+
         if(userRepository.findByEmail(request.getEmail()).isPresent()) throw new CredAlreadyExistException("email already exists");
         if(userRepository.findByUsername(request.getUsername()).isPresent()) throw new CredAlreadyExistException("username already exists");
-
-        if(request.getEmail().isEmpty() || request.getEmail().isBlank()) throw new RuntimeException("email cannot be empty");
-        if(request.getUsername().isEmpty() || request.getUsername().isBlank()) throw new RuntimeException("username cannot be empty");
-        if(request.getPassword().isEmpty() || request.getPassword().isBlank()) throw new RuntimeException("password cannot be empty");
-        if(request.getPassword().length() < 8) throw new RuntimeException("password too short");
 
         User user = User.builder()
                 .email(request.getEmail())
@@ -58,8 +58,8 @@ public class AuthServiceImplementation implements AuthService {
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        if(request.getEmail().isBlank() || request.getEmail().isEmpty()) throw new RuntimeException("email cannot be empty");
-        if(request.getPassword().isBlank() || request.getPassword().isEmpty()) throw new RuntimeException("email cannot be empty");
+        if(request.getEmail() == null || request.getEmail().isBlank() || request.getEmail().isEmpty()) throw new RuntimeException("email cannot be empty");
+        if(request.getPassword() == null || request.getPassword().isBlank() || request.getPassword().isEmpty()) throw new RuntimeException("email cannot be empty");
 
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new BadCredentialsException("invalid credentials"));
 
