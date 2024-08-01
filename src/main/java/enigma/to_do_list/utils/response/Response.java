@@ -32,7 +32,7 @@ public class Response {
     public static <T> ResponseEntity<?> renderError(String message, HttpStatus httpStatus) {
         WebResponseError<T> response = WebResponseError.<T>builder()
                 .message(message)
-                .status(httpStatus.getReasonPhrase())
+                .error(httpStatus.getReasonPhrase())
                 .build();
         return ResponseEntity.status(httpStatus).body(response);
     }
