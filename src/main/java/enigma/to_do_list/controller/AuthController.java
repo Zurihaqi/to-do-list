@@ -34,6 +34,10 @@ public class AuthController {
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
     ) {
+        String validEmailFormat = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+        if (!request.getEmail().matches(validEmailFormat)) {
+            throw new RuntimeException("Invalid email format");
+        }
 
         return ResponseEntity.ok(authService.authenticate(request));
     }
