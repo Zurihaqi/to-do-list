@@ -59,7 +59,7 @@ public class AuthServiceImplementation implements AuthService {
         if(request.getEmail().isBlank() || request.getEmail().isEmpty()) throw new RuntimeException("email cannot be empty");
         if(request.getPassword().isBlank() || request.getPassword().isEmpty()) throw new RuntimeException("email cannot be empty");
 
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("email is not registered"));
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new BadCredentialsException("invalid email or password"));
 
         try {
             Authentication authentication = authenticationManager.authenticate(
