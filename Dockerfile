@@ -17,6 +17,6 @@ RUN mvn clean package -DskipTests
 #
 FROM eclipse-temurin:17-jre-focal
 WORKDIR /usr/local/lib
-COPY --from=build /home/app/target/todolist-0.0.1-SNAPSHOT.jar .
+COPY --from=build /home/app/target/to-do-list-0.0.1-SNAPSHOT.jar .
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/usr/local/lib/todolist-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-jar","/usr/local/lib/to-do-list-0.0.1-SNAPSHOT.jar"]
