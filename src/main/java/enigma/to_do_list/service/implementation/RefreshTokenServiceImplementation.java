@@ -1,5 +1,6 @@
 package enigma.to_do_list.service.implementation;
 
+import enigma.to_do_list.exception.InvalidRefreshTokenException;
 import enigma.to_do_list.model.RefreshToken;
 import enigma.to_do_list.model.User;
 import enigma.to_do_list.repository.RefreshTokenRepository;
@@ -49,7 +50,7 @@ public class RefreshTokenServiceImplementation implements RefreshTokenService {
         String accessToken = refreshTokenRepository.findByToken(refreshToken)
                 .map(this::verifyExpiration).map(RefreshToken::getUser)
                 .map(jwtService::generateToken)
-                .orElseThrow(() -> new RuntimeException("Refresh token not found"));
+                .orElseThrow(() -> new InvalidRefreshTokenException("invalid refresh token"));
 
         return new AuthDto.RefreshTokenResponse(accessToken);
     }

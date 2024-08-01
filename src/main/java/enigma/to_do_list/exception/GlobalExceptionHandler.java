@@ -24,4 +24,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleUnauthorizedRoleException(UnauthorizedRoleException ex) {
         return Response.renderError(ex, ex.getMessage(), HttpStatus.FORBIDDEN);
     }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<?> handleInvalidRefreshTokenException(InvalidRefreshTokenException ex) {
+        return Response.renderError(ex, ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
 }
