@@ -22,6 +22,11 @@ public class AuthController {
     public ResponseEntity<?> register(
             @RequestBody RegisterRequest request
     ) {
+        String validEmailFormat = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+        if (!request.getEmail().matches(validEmailFormat)) {
+            throw new RuntimeException("Invalid email format");
+        }
+
         return new ResponseEntity<>(authService.register(request), HttpStatus.CREATED);
     }
 

@@ -34,7 +34,7 @@ public class TaskServiceImplementation implements TaskService {
         if(task.getDescription() == null || task.getDescription().isEmpty() || task.getDescription().isBlank()) throw new RuntimeException("description cannot be empty");
 
         Date validDueDate = task.getDueDate();
-        if(validDueDate.before(new Date())) throw new RuntimeException("due date must be in the future");
+        if(validDueDate.before(new Date())) throw new RuntimeException("dueDate must be in the future");
 
         Task newTask = taskRepository.save(Task.builder()
                 .user(user)
