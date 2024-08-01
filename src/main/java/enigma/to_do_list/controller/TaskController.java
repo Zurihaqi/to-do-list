@@ -38,10 +38,19 @@ public class TaskController {
         return new ResponseEntity<>(taskService.updateStatus(id, request), HttpStatus.OK);
     }
 
-    @GetMapping()
-    public ResponseEntity<?> getAll(@AuthenticationPrincipal User user, @PageableDefault Pageable pageable, @RequestParam(required = false) String status){
+    @GetMapping
+    public ResponseEntity<?> getAll(
+            @AuthenticationPrincipal User user,
+            @PageableDefault Pageable pageable,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String order
+    ){
 
-        Page<Task> task = taskService.getAll(user, pageable, status);
+        sortBy = (sortBy == null || sortBy.isEmpty()) ? "createdAt" : sortBy;
+        order = (order == null || order.isEmpty()) ? "asc" : order;
+
+        Page<Task> task = taskService.getAll(user, pageable, status, sortBy, order);
         PageResponseWrapper<Task> response = new PageResponseWrapper<>(task);
 
         return new ResponseEntity<>(response, HttpStatus.OK);

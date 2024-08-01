@@ -11,7 +11,9 @@ import enigma.to_do_list.utils.dto.TaskDto;
 import enigma.to_do_list.utils.specification.TaskSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -92,16 +94,33 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     @Override
-    public Page<Task> getAll(User user, Pageable pageable, String status) {
+    public Page<Task> getAll(User user, Pageable pageable, String status, String sortBy, String order) {
+
         Specification<Task> specStatus = TaskSpecification.filterByStatus(status);
         Specification<Task> specUserId = TaskSpecification.filterByUserId(user.getId());
 
-        if(user.getRole().equals(User.Role.ROLE_ADMIN)) {
-            return taskRepository.findAll(specStatus, pageable);
-        } else {
+        Specification<Task> specification = user.getRole().equals(User.Role.ROLE_ADMIN)
+                ? specStatus
+                : specUserId.and(specStatus);
 
-            return taskRepository.findAll(specUserId.and(specStatus), pageable);
+        Pageable sortedPageable = createPageableWithSorting(pageable, sortBy, order);
+
+        return taskRepository.findAll(specification, sortedPageable);
+    }
+
+    private Pageable createPageableWithSorting(Pageable pageable, String sortBy, String order) {
+        Sort sort = Sort.by(Sort.Order.asc("createdAt"));
+        if ("dueDate".equalsIgnoreCase(sortBy)) {
+            sort = Sort.by(Sort.Order.asc("dueDate"));
         }
+
+        if ("desc".equalsIgnoreCase(order)) {
+            sort = sort.and(Sort.by(Sort.Order.desc(sortBy)));
+        } else {
+            sort = sort.and(Sort.by(Sort.Order.asc(sortBy)));
+        }
+
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
     }
 
     @Override
