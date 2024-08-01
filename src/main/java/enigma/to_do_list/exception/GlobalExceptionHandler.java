@@ -12,16 +12,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException ex) {
-        return Response.renderError(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return Response.renderError(ex, ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException ex) {
-        return Response.renderError("Invalid email or password", HttpStatus.UNAUTHORIZED);
+        return Response.renderError(ex,"Invalid email or password", HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(UnauthorizedRoleException.class)
     public ResponseEntity<?> handleUnauthorizedRoleException(UnauthorizedRoleException ex) {
-        return Response.renderError(ex.getMessage(), HttpStatus.FORBIDDEN);
+        return Response.renderError(ex, ex.getMessage(), HttpStatus.FORBIDDEN);
     }
 }

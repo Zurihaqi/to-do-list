@@ -11,5 +11,6 @@ import java.util.List;
 @Builder
 public class WebResponseError<T> {
     private String message;
-    private String error;
+    private String status;
+    private List<String> errors;
 }
