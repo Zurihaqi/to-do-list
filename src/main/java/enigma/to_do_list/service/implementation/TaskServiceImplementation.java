@@ -1,5 +1,6 @@
 package enigma.to_do_list.service.implementation;
 
+import enigma.to_do_list.exception.UnauthorizedRoleException;
 import enigma.to_do_list.model.Task;
 import enigma.to_do_list.model.User;
 import enigma.to_do_list.repository.TaskRepository;
@@ -7,9 +8,11 @@ import enigma.to_do_list.repository.UserRepository;
 import enigma.to_do_list.security.UserSecurity;
 import enigma.to_do_list.service.TaskService;
 import enigma.to_do_list.utils.dto.TaskDto;
+import enigma.to_do_list.utils.specification.TaskSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -23,94 +26,104 @@ public class TaskServiceImplementation implements TaskService {
     private final UserSecurity userSecurity;
 
     @Override
-    public TaskDto.response create(TaskDto.request task) {
-        User user = userRepository.findById(
-                userSecurity.getCurrentUserId()
-        ).orElseThrow(() -> new RuntimeException("user with id " + task.getUser_id() + " cannot be found"));
-        if(task.getTask() == null || task.getTask().isEmpty() || task.getTask().isBlank()) throw new RuntimeException("task cannot be empty");
+    public TaskDto.response create(User user, TaskDto.request task) {
+        if(task.getTitle() == null || task.getTitle().isEmpty() || task.getTitle().isBlank()) throw new RuntimeException("title cannot be empty");
+        if(task.getDueDate() == null) throw new RuntimeException("dueDate cannot be empty");
 
         Task newTask = taskRepository.save(Task.builder()
                 .user(user)
-                .task(task.getTask())
+                .title(task.getTitle())
+                .description(task.getDescription())
                 .createdAt(new Date())
-                .completed(false)
-                .completedAt(null)
+                .status(Task.Status.IN_PROGRESS)
+                .dueDate(task.getDueDate())
                 .build()
         );
 
         return TaskDto.response.builder()
-                .task(newTask.getTask())
-                .user_id(newTask.getUser().getId())
+                .title(newTask.getTitle())
+                .id(newTask.getId())
+                .description(newTask.getDescription())
                 .createdAt(newTask.getCreatedAt())
-                .completedAt(newTask.getCompletedAt())
-                .completed(newTask.isCompleted())
+                .dueDate(newTask.getDueDate())
+                .status(newTask.getStatus())
                 .build();
     }
 
     @Override
     public TaskDto.response update(Integer id, TaskDto.request task) {
         Task newTask = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " doesn't exist"));
-        if(!Objects.equals(userSecurity.getCurrentUserRole(), "ADMIN") && !Objects.equals(newTask.getUser().getId(), userSecurity.getCurrentUserId())) throw new RuntimeException("not authorized");
+        if(userSecurity.getCurrentUserRole().equals("ROLE_USER") && !userSecurity.getCurrentUserId().equals(newTask.getUser().getId())) throw new UnauthorizedRoleException("you can't update other user's tasks");
 
-        // Update user is optional
-        if(task.getUser_id() != null){
-            if(!Objects.equals(userSecurity.getCurrentUserRole(), "ADMIN") && !Objects.equals(task.getUser_id(), userSecurity.getCurrentUserId())) throw new RuntimeException("not authorized");
-            newTask.setUser(userRepository.findById(task.getUser_id()).orElseThrow(() -> new RuntimeException("user with id " + task.getUser_id() + " doesn't exist")));
-        }
-
-        if(task.getTask() == null || task.getTask().isEmpty() || task.getTask().isBlank()) throw new RuntimeException("task cannot be empty");
-        newTask.setTask(task.getTask());
+        if(task.getTitle() != null && !task.getTitle().isEmpty() && !task.getTitle().isBlank()) newTask.setTitle(task.getTitle());
+        if(task.getStatus() != null) newTask.setStatus(task.getStatus());
+        if(task.getDueDate() != null) newTask.setDueDate(task.getDueDate());
+        if(task.getDescription() != null && !task.getDescription().isEmpty() && !task.getDescription().isBlank()) newTask.setDescription(task.getDescription());
 
         taskRepository.save(newTask);
 
         return TaskDto.response.builder()
-                .task(newTask.getTask())
-                .user_id(newTask.getUser().getId())
+                .title(newTask.getTitle())
+                .id(newTask.getId())
                 .createdAt(newTask.getCreatedAt())
-                .completedAt(newTask.getCompletedAt())
-                .completed(newTask.isCompleted())
+                .description(newTask.getDescription())
+                .dueDate(newTask.getDueDate())
+                .status(newTask.getStatus())
                 .build();
     }
 
     @Override
-    public Page<Task> getAll(Pageable pageable) {
-        return taskRepository.findAllByUser_id(userSecurity.getCurrentUserId(), pageable);
+    public TaskDto.response updateStatus(Integer id, TaskDto.request task) {
+        Task newTask = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " doesn't exist"));
+        if(userSecurity.getCurrentUserRole().equals("ROLE_USER") && !userSecurity.getCurrentUserId().equals(newTask.getUser().getId())) throw new UnauthorizedRoleException("you can't update other user's tasks");
+        if(task.getStatus() == null) throw new RuntimeException("status cannot be empty");
+
+        newTask.setStatus(task.getStatus());
+        taskRepository.save(newTask);
+
+        return TaskDto.response.builder()
+                .title(newTask.getTitle())
+                .id(newTask.getId())
+                .createdAt(newTask.getCreatedAt())
+                .description(newTask.getDescription())
+                .dueDate(newTask.getDueDate())
+                .status(newTask.getStatus())
+                .build();
+    }
+
+    @Override
+    public Page<Task> getAll(User user, Pageable pageable, String status) {
+        Specification<Task> specStatus = TaskSpecification.filterByStatus(status);
+        Specification<Task> specUserId = TaskSpecification.filterByUserId(user.getId());
+
+        if(user.getRole().equals(User.Role.ROLE_ADMIN)) {
+            return taskRepository.findAll(specStatus, pageable);
+        } else {
+
+            return taskRepository.findAll(specUserId.and(specStatus), pageable);
+        }
     }
 
     @Override
     public TaskDto.response getById(Integer id) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " not found"));
-        if(!Objects.equals(userSecurity.getCurrentUserRole(), "ADMIN") && !Objects.equals(task.getUser().getId(), userSecurity.getCurrentUserId())) throw new RuntimeException("not authorized");
+        if(userSecurity.getCurrentUserRole().equals("ROLE_USER") && !userSecurity.getCurrentUserId().equals(task.getUser().getId())) throw new UnauthorizedRoleException("you can't view other user's tasks");
 
         return TaskDto.response.builder()
-                .task(task.getTask())
-                .user_id(task.getUser().getId())
+                .title(task.getTitle())
+                .id(task.getId())
                 .createdAt(task.getCreatedAt())
-                .completedAt(task.getCompletedAt())
-                .completed(task.isCompleted())
+                .description(task.getDescription())
+                .dueDate(task.getDueDate())
+                .status(task.getStatus())
                 .build();
     }
 
     @Override
     public void delete(Integer id) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " not found"));
-        if(!Objects.equals(userSecurity.getCurrentUserRole(), "ADMIN") && !Objects.equals(task.getUser().getId(), userSecurity.getCurrentUserId())) throw new RuntimeException("not authorized");
+        if(userSecurity.getCurrentUserRole().equals("ROLE_USER") && !userSecurity.getCurrentUserId().equals(task.getUser().getId())) throw new UnauthorizedRoleException("you can't delete other user's tasks");
 
         taskRepository.deleteById(id);
-    }
-
-    @Override
-    public void toggleCompletion(Integer id) {
-        Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " not found"));
-        if(!Objects.equals(userSecurity.getCurrentUserRole(), "ADMIN") && !Objects.equals(task.getUser().getId(), userSecurity.getCurrentUserId())) throw new RuntimeException("not authorized");
-
-        task.setCompleted(!task.isCompleted());
-        if (task.isCompleted()) {
-            task.setCompletedAt(new Date());
-        } else {
-            task.setCompletedAt(null);
-        }
-
-        taskRepository.save(task);
     }
 }

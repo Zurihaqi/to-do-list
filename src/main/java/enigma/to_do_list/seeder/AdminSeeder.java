@@ -31,7 +31,7 @@ public class AdminSeeder implements CommandLineRunner {
         userRepository.save(
                 User.builder()
                         .email(adminEmail)
-                        .name("Admin")
+                        .username("Admin")
                         .password(passwordEncoder.encode(adminPassword))
                         .role(User.Role.ROLE_ADMIN)
                 .build()

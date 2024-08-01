@@ -1,0 +1,30 @@
+services:
+    to-do-app:
+        container_name: 'todo-app'
+        build: .
+        image: 'zrymund/todo-app:0.0.1'
+        ports:
+            - '8080:8080'
+        depends_on:
+            - db
+        environment:
+            DB_HOST: db
+            DB_PORT: 5432
+            DB_NAME: to_do_list
+            DB_USER: postgres
+            DB_PASSWORD: postgres
+
+    db:
+        container_name: 'postgres-server'
+        image: 'postgres'
+        ports:
+            - '5433:5432'
+        environment:
+            POSTGRES_DB: 'to_do_list'
+            POSTGRES_USER: 'postgres'
+            POSTGRES_PASSWORD: 'postgres'
+        volumes:
+            - db_data:/var/lib/postgresql/data
+
+volumes:
+    db_data:

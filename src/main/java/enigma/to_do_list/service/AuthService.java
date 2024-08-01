@@ -4,9 +4,9 @@ import enigma.to_do_list.utils.dto.AuthDto;
 import enigma.to_do_list.utils.dto.AuthDto.RegisterRequest;
 import enigma.to_do_list.utils.dto.AuthDto.AuthenticationRequest;
 import enigma.to_do_list.utils.dto.AuthDto.AuthenticationResponse;
-import org.springframework.http.ResponseEntity;
+import enigma.to_do_list.utils.dto.AuthDto.RegisterResponse;
 
 public interface AuthService {
-    ResponseEntity<?> register(RegisterRequest request);
+    RegisterResponse register(RegisterRequest request);
     AuthenticationResponse authenticate(AuthenticationRequest request);
 }

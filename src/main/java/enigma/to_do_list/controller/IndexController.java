@@ -14,6 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class IndexController {
     @GetMapping
     public ResponseEntity<?> home() {
-        return Response.renderJson("Nginx load balancer test", HttpStatus.OK);
+        return Response.renderJson("Zul Fahri Baihaqi - ToDoList", HttpStatus.OK);
     }
 }

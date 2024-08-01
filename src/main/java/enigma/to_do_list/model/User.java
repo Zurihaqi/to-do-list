@@ -25,7 +25,8 @@ public class User implements UserDetails {
     private String email;
     @JsonIgnore
     private String password;
-    private String name;
+    @Column(unique = true)
+    private String username;
     private Role role;
 
     @Override
@@ -33,12 +34,20 @@ public class User implements UserDetails {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
-    @Override
-    public String getUsername() {
-        return this.email;
+    public String getUsernameDto() {
+        return username;
     }
 
-    public static enum Role {
+    public String getActualUsername() {
+        return username;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    public enum Role {
         ROLE_USER,
         ROLE_ADMIN
     };

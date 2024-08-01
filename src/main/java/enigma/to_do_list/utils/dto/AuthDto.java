@@ -1,5 +1,6 @@
 package enigma.to_do_list.utils.dto;
 
+import enigma.to_do_list.model.RefreshToken;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,9 +13,19 @@ public class AuthDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class RegisterRequest {
-        private String name;
+        private String username;
         private String email;
         private String password;
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class RegisterResponse {
+        private Integer id;
+        private String username;
+        private String email;
     }
 
     @Data
@@ -30,7 +41,24 @@ public class AuthDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    public static class RefreshTokenRequest {
+        private String refreshToken;
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class RefreshTokenResponse {
+        private String accessToken;
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class AuthenticationResponse {
-        private String token;
+        private String accessToken;
+        private String refreshToken;
     }
 }
