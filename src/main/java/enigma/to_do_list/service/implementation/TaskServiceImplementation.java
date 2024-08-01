@@ -31,13 +31,17 @@ public class TaskServiceImplementation implements TaskService {
     public TaskDto.response create(User user, TaskDto.request task) {
         if(task.getTitle() == null || task.getTitle().isEmpty() || task.getTitle().isBlank()) throw new RuntimeException("title cannot be empty");
         if(task.getDueDate() == null) throw new RuntimeException("dueDate cannot be empty");
+        if(task.getDescription() == null || task.getDescription().isEmpty() || task.getDescription().isBlank()) throw new RuntimeException("description cannot be empty");
+
+        Date validDueDate = task.getDueDate();
+        if(validDueDate.before(new Date())) throw new RuntimeException("due date must be in the future");
 
         Task newTask = taskRepository.save(Task.builder()
                 .user(user)
                 .title(task.getTitle())
                 .description(task.getDescription())
                 .createdAt(new Date())
-                .status(Task.Status.IN_PROGRESS)
+                .status(Task.Status.PENDING)
                 .dueDate(task.getDueDate())
                 .build()
         );

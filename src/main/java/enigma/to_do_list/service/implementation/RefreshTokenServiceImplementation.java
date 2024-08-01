@@ -47,6 +47,8 @@ public class RefreshTokenServiceImplementation implements RefreshTokenService {
 
     @Override
     public AuthDto.RefreshTokenResponse refreshToken(String refreshToken) {
+        if(refreshToken == null || refreshToken.isEmpty()) throw new InvalidRefreshTokenException("refresh token cannot be empty");
+
         String accessToken = refreshTokenRepository.findByToken(refreshToken)
                 .map(this::verifyExpiration).map(RefreshToken::getUser)
                 .map(jwtService::generateToken)
