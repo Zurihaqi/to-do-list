@@ -36,8 +36,9 @@ public class TaskServiceImplementation implements TaskService {
         if(task.getDueDate() == null) throw new RuntimeException("dueDate cannot be empty");
         if(task.getDescription() == null || task.getDescription().isEmpty() || task.getDescription().isBlank()) throw new RuntimeException("description cannot be empty");
 
-        // Add "Z" at the end of the string and convert to OffsetDateTime
-        OffsetDateTime validDueDate = OffsetDateTime.parse(task.getDueDate() + "Z");
+        // if task due date dont have "Z" at the end, add it
+        if(!task.getDueDate().endsWith("Z")) task.setDueDate(task.getDueDate() + "Z");
+        OffsetDateTime validDueDate = OffsetDateTime.parse(task.getDueDate());
         if(validDueDate.isBefore(OffsetDateTime.now())) throw new RuntimeException("due date must be in the future");
 
         Task newTask = taskRepository.save(Task.builder()
@@ -65,9 +66,12 @@ public class TaskServiceImplementation implements TaskService {
         Task newTask = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " doesn't exist"));
         if(userSecurity.getCurrentUserRole().equals("ROLE_USER") && !userSecurity.getCurrentUserId().equals(newTask.getUser().getId())) throw new UnauthorizedRoleException("you can't update other user's tasks");
 
+        // if task due date dont have "Z" at the end, add it
+        if(task.getDueDate() != null && !task.getDueDate().endsWith("Z")) task.setDueDate(task.getDueDate() + "Z");
+
         if(task.getTitle() != null && !task.getTitle().isEmpty() && !task.getTitle().isBlank()) newTask.setTitle(task.getTitle());
         if(task.getStatus() != null) newTask.setStatus(task.getStatus());
-        if(task.getDueDate() != null) newTask.setDueDate(OffsetDateTime.parse(task.getDueDate() + "Z"));
+        if(task.getDueDate() != null) newTask.setDueDate(OffsetDateTime.parse(task.getDueDate()));
         if(task.getDescription() != null && !task.getDescription().isEmpty() && !task.getDescription().isBlank()) newTask.setDescription(task.getDescription());
 
         taskRepository.save(newTask);
