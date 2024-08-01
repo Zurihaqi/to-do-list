@@ -33,7 +33,7 @@ public class TaskServiceImplementation implements TaskService {
         if(task.getDueDate() == null) throw new RuntimeException("dueDate cannot be empty");
         if(task.getDescription() == null || task.getDescription().isEmpty() || task.getDescription().isBlank()) throw new RuntimeException("description cannot be empty");
 
-        Date validDueDate = task.getDueDate();
+        Date validDueDate = Date.from(task.getDueDate());
         if(validDueDate.before(new Date())) throw new RuntimeException("due date must be in the future");
 
         Task newTask = taskRepository.save(Task.builder()
@@ -42,7 +42,7 @@ public class TaskServiceImplementation implements TaskService {
                 .description(task.getDescription())
                 .createdAt(new Date())
                 .status(Task.Status.PENDING)
-                .dueDate(task.getDueDate())
+                .dueDate(Date.from(task.getDueDate()))
                 .build()
         );
 
@@ -63,7 +63,7 @@ public class TaskServiceImplementation implements TaskService {
 
         if(task.getTitle() != null && !task.getTitle().isEmpty() && !task.getTitle().isBlank()) newTask.setTitle(task.getTitle());
         if(task.getStatus() != null) newTask.setStatus(task.getStatus());
-        if(task.getDueDate() != null) newTask.setDueDate(task.getDueDate());
+        if(task.getDueDate() != null) newTask.setDueDate(Date.from(task.getDueDate()));
         if(task.getDescription() != null && !task.getDescription().isEmpty() && !task.getDescription().isBlank()) newTask.setDescription(task.getDescription());
 
         taskRepository.save(newTask);
