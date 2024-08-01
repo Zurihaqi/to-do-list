@@ -1,5 +1,16 @@
-FROM openjdk:17-alpine
 
-ADD target/to-do-list-0.0.1-SNAPSHOT.jar to-do-list.jar
+#
+# Build stage
+#
+FROM maven:3.6.0-jdk-11-slim AS build
+COPY src /home/app/src
+COPY pom.xml /home/app
+RUN mvn -f /home/app/pom.xml clean package
 
-CMD ["java", "-jar", "to-do-list.jar"]
+#
+# Package stage
+#
+FROM openjdk:11-jre-slim
+COPY --from=build /home/app/target/todolist-0.0.1-SNAPSHOT.jar /usr/local/lib/todolist.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/usr/local/lib/todolist.jar"]
