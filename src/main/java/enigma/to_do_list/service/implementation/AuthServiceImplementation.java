@@ -32,6 +32,10 @@ public class AuthServiceImplementation implements AuthService {
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
+        String validEmailFormat = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+        if (!request.getEmail().matches(validEmailFormat)) {
+            throw new RuntimeException("Invalid email format");
+        }
         if(userRepository.findByEmail(request.getEmail()).isPresent()) throw new CredAlreadyExistException("email already exists");
         if(userRepository.findByUsername(request.getUsername()).isPresent()) throw new CredAlreadyExistException("username already exists");
 

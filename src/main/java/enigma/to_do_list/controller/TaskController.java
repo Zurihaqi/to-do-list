@@ -17,7 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/todos/")
+@RequestMapping("/api/todos")
 @RequiredArgsConstructor
 public class TaskController {
     private final TaskService taskService;
