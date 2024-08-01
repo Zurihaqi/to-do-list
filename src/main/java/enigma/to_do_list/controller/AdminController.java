@@ -24,7 +24,8 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
     private final UserService userService;
     private final TaskService taskService;
-    private final String superAdminSecretKey = "1337hax0r";
+    private final String superAdminSecretKey = "superman admin turing machine gigachad sigma";
+    private final String adminSecretKey = "admin turing machine alpha beta";
 
     @GetMapping("/users")
     public ResponseEntity<?> getAll(@PageableDefault Pageable pageable){
@@ -44,7 +45,7 @@ public class AdminController {
             @Valid @RequestBody User request,
             @RequestHeader(value = "X-Admin-Secret-Key", required = false) String adminSecretKeyHeader
     ){
-        if (!superAdminSecretKey.equals(adminSecretKeyHeader)) {
+        if (!adminSecretKey.equals(adminSecretKeyHeader)) {
             return new ResponseEntity<>("Invalid admin secret key", HttpStatus.FORBIDDEN);
         }
 
@@ -54,8 +55,8 @@ public class AdminController {
     @PostMapping("/super-admin")
     public ResponseEntity<?> createSuperAdmin(
             @Valid @RequestBody AuthDto.RegisterRequest request,
-            @RequestHeader(value = "X-Admin-Secret-Key", required = false) String adminSecretKeyHeader){
-        if (!superAdminSecretKey.equals(adminSecretKeyHeader)) {
+            @RequestHeader(value = "X-Super-Admin-Secret-Key", required = false) String superAdminSecretKeyHeader){
+        if (!superAdminSecretKey.equals(superAdminSecretKeyHeader)) {
             return new ResponseEntity<>("Invalid admin secret key", HttpStatus.FORBIDDEN);
         }
 
