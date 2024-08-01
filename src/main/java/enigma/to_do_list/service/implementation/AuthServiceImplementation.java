@@ -1,5 +1,6 @@
 package enigma.to_do_list.service.implementation;
 
+import enigma.to_do_list.exception.CredAlreadyExistException;
 import enigma.to_do_list.model.RefreshToken;
 import enigma.to_do_list.model.User;
 import enigma.to_do_list.repository.RefreshTokenRepository;
@@ -31,8 +32,8 @@ public class AuthServiceImplementation implements AuthService {
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
-        if(userRepository.findByEmail(request.getEmail()).isPresent()) throw new RuntimeException("email already exists");
-        if(userRepository.findByUsername(request.getUsername()).isPresent()) throw new RuntimeException("username already exists");
+        if(userRepository.findByEmail(request.getEmail()).isPresent()) throw new CredAlreadyExistException("email already exists");
+        if(userRepository.findByUsername(request.getUsername()).isPresent()) throw new CredAlreadyExistException("username already exists");
 
         if(request.getEmail().isEmpty() || request.getEmail().isBlank()) throw new RuntimeException("email cannot be empty");
         if(request.getUsername().isEmpty() || request.getUsername().isBlank()) throw new RuntimeException("username cannot be empty");
