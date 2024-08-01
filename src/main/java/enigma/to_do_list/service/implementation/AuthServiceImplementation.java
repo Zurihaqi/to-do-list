@@ -31,11 +31,13 @@ public class AuthServiceImplementation implements AuthService {
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
-        if(userRepository.findByEmail(request.getEmail()).isPresent()) throw new RuntimeException("email already registered");
+        if(userRepository.findByEmail(request.getEmail()).isPresent()) throw new RuntimeException("email already exists");
+        if(userRepository.findByUsername(request.getUsername()).isPresent()) throw new RuntimeException("username already exists");
 
         if(request.getEmail().isEmpty() || request.getEmail().isBlank()) throw new RuntimeException("email cannot be empty");
         if(request.getUsername().isEmpty() || request.getUsername().isBlank()) throw new RuntimeException("username cannot be empty");
         if(request.getPassword().isEmpty() || request.getPassword().isBlank()) throw new RuntimeException("password cannot be empty");
+        if(request.getPassword().length() < 8) throw new RuntimeException("password too short");
 
         User user = User.builder()
                 .email(request.getEmail())
@@ -48,7 +50,6 @@ public class AuthServiceImplementation implements AuthService {
         savedUser.setPassword(null);
 
         return RegisterResponse.builder()
-                .id(savedUser.getId())
                 .username(savedUser.getActualUsername())
                 .email(savedUser.getEmail())
                 .build();

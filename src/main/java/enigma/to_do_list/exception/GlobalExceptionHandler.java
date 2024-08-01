@@ -29,4 +29,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleInvalidRefreshTokenException(InvalidRefreshTokenException ex) {
         return Response.renderError(ex, ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(CredAlreadyExistException.class)
+    public ResponseEntity<?> handleCredAlreadyExistException(CredAlreadyExistException ex) {
+        return Response.renderError(ex, ex.getMessage(), HttpStatus.CONFLICT);
+    }
 }
