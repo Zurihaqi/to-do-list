@@ -1,6 +1,7 @@
 package enigma.to_do_list.utils.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import enigma.to_do_list.model.Task;
 import lombok.*;
 
@@ -26,6 +27,8 @@ public class TaskDto {
     @Builder
     public static class response {
         private Integer id;
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private Integer userId;
         private String title;
         private String description;
 

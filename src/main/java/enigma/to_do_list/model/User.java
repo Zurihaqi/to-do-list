@@ -8,6 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -28,14 +29,11 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String username;
     private Role role;
+    private Date createdAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
-    }
-
-    public String getUsernameDto() {
-        return username;
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     public String getActualUsername() {
@@ -48,7 +46,8 @@ public class User implements UserDetails {
     }
 
     public enum Role {
-        ROLE_USER,
-        ROLE_ADMIN
+        USER,
+        ADMIN,
+        SUPER_ADMIN
     };
 }

@@ -1,6 +1,5 @@
 package enigma.to_do_list.controller;
 
-import enigma.to_do_list.model.Task;
 import enigma.to_do_list.model.User;
 import enigma.to_do_list.service.TaskService;
 import enigma.to_do_list.utils.PageResponseWrapper;
@@ -50,8 +49,8 @@ public class TaskController {
         sortBy = (sortBy == null || sortBy.isEmpty()) ? "createdAt" : sortBy;
         order = (order == null || order.isEmpty()) ? "asc" : order;
 
-        Page<Task> task = taskService.getAll(user, pageable, status, sortBy, order);
-        PageResponseWrapper<Task> response = new PageResponseWrapper<>(task);
+        Page<TaskDto.response> task = taskService.getAll(user, pageable, status, sortBy, order);
+        PageResponseWrapper<TaskDto.response> response = new PageResponseWrapper<>(task);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

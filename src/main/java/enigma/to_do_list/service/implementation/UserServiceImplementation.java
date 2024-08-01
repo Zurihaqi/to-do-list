@@ -5,6 +5,7 @@ import enigma.to_do_list.model.User;
 import enigma.to_do_list.repository.UserRepository;
 import enigma.to_do_list.security.UserSecurity;
 import enigma.to_do_list.service.UserService;
+import enigma.to_do_list.utils.dto.AuthDto;
 import enigma.to_do_list.utils.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Objects;
 
 @Service
@@ -64,13 +66,25 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public void updateRole(Integer id, String role) {
+    public UserDto updateRole(Integer id, String role) {
         UserDto userDto = getById(id);
         User user = userRepository.findById(userDto.getId()).orElseThrow(() -> new RuntimeException("user with id " + id + " not found"));
 
-        if(!Objects.equals(userSecurity.getCurrentUserRole(), "ADMIN")) throw new UnauthorizedRoleException("only Admin can update other user's role");
+        if(!Objects.equals(userSecurity.getCurrentUserRole(), "SUPER_ADMIN")) throw new UnauthorizedRoleException("only Super Admin can update other user's role");
         if(role == null || role.isEmpty() || role.isBlank()) throw new RuntimeException("role cannot be empty");
-        if(!role.equals("ADMIN") && !role.equals("USER")) throw new RuntimeException("role must be ROLE_ADMIN or ROLE_USER");
+        if(!role.equals("ADMIN") && !role.equals("USER")) throw new RuntimeException("role must be ADMIN or USER");
+
+        user.setRole(User.Role.valueOf(role));
+
+        userRepository.save(user);
+
+        return UserDto.builder()
+                .id(user.getId())
+                .username(user.getActualUsername())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .createdAt(user.getCreatedAt())
+                .build();
     }
 
     @Override
@@ -82,18 +96,45 @@ public class UserServiceImplementation implements UserService {
                 .username(user.getActualUsername())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .createdAt(user.getCreatedAt())
                 .build());
     }
 
     @Override
     public UserDto getById(Integer id) {
-        if(!Objects.equals(userSecurity.getCurrentUserRole(), "ADMIN") && !Objects.equals(id, userSecurity.getCurrentUserId())) throw new UnauthorizedRoleException("you can't get other user's data");
+        if(!Objects.equals(userSecurity.getCurrentUserRole(), "SUPERADMIN") && !Objects.equals(id, userSecurity.getCurrentUserId())) throw new UnauthorizedRoleException("you can't get other user's data");
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("user with id " + id + " not found"));
         return UserDto.builder()
                 .id(user.getId())
                 .username(user.getActualUsername())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .createdAt(user.getCreatedAt())
+                .build();
+    }
+
+    @Override
+    public UserDto createSuperAdmin(AuthDto.RegisterRequest user) {
+        if(user.getUsername() == null || user.getUsername().isEmpty() || user.getUsername().isBlank()) throw new RuntimeException("username cannot be empty");
+        if(user.getEmail() == null || user.getEmail().isEmpty() || user.getEmail().isBlank()) throw new RuntimeException("email cannot be empty");
+        if(user.getPassword() == null || user.getPassword().isEmpty() || user.getPassword().isBlank()) throw new RuntimeException("password cannot be empty");
+        if(user.getPassword().length() < 8) throw new RuntimeException("password too short");
+
+        User savedUser = userRepository.save(User.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .password(passwordEncoder.encode(user.getPassword()))
+                .role(User.Role.SUPER_ADMIN)
+                .createdAt(new Date())
+                .build()
+        );
+        savedUser.setPassword(null);
+        return UserDto.builder()
+                .id(savedUser.getId())
+                .username(savedUser.getActualUsername())
+                .email(savedUser.getEmail())
+                .role(savedUser.getRole())
+                .createdAt(savedUser.getCreatedAt())
                 .build();
     }
 

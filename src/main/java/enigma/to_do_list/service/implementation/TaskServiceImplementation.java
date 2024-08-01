@@ -17,11 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -64,7 +60,7 @@ public class TaskServiceImplementation implements TaskService {
     @Override
     public TaskDto.response update(Integer id, TaskDto.request task) {
         Task newTask = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " doesn't exist"));
-        if(userSecurity.getCurrentUserRole().equals("ROLE_USER") && !userSecurity.getCurrentUserId().equals(newTask.getUser().getId())) throw new UnauthorizedRoleException("you can't update other user's tasks");
+        if(userSecurity.getCurrentUserRole().equals("USER") && !userSecurity.getCurrentUserId().equals(newTask.getUser().getId())) throw new UnauthorizedRoleException("you can't update other user's tasks");
 
         // if task due date dont have "Z" at the end, add it
         if(task.getDueDate() != null && !task.getDueDate().endsWith("Z")) task.setDueDate(task.getDueDate() + "Z");
@@ -89,7 +85,7 @@ public class TaskServiceImplementation implements TaskService {
     @Override
     public TaskDto.response updateStatus(Integer id, TaskDto.request task) {
         Task newTask = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " doesn't exist"));
-        if(userSecurity.getCurrentUserRole().equals("ROLE_USER") && !userSecurity.getCurrentUserId().equals(newTask.getUser().getId())) throw new UnauthorizedRoleException("you can't update other user's tasks");
+        if(userSecurity.getCurrentUserRole().equals("USER") && !userSecurity.getCurrentUserId().equals(newTask.getUser().getId())) throw new UnauthorizedRoleException("you can't update other user's tasks");
         if(task.getStatus() == null) throw new RuntimeException("status cannot be empty");
 
         newTask.setStatus(task.getStatus());
@@ -106,18 +102,30 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     @Override
-    public Page<Task> getAll(User user, Pageable pageable, String status, String sortBy, String order) {
+    public Page<TaskDto.response> getAll(User user, Pageable pageable, String status, String sortBy, String order) {
 
         Specification<Task> specStatus = TaskSpecification.filterByStatus(status);
         Specification<Task> specUserId = TaskSpecification.filterByUserId(user.getId());
 
-        Specification<Task> specification = user.getRole().equals(User.Role.ROLE_ADMIN)
+        Specification<Task> specification = user.getRole().equals(User.Role.ADMIN)
                 ? specStatus
                 : specUserId.and(specStatus);
 
         Pageable sortedPageable = createPageableWithSorting(pageable, sortBy, order);
 
-        return taskRepository.findAll(specification, sortedPageable);
+        Page<Task> tasks = taskRepository.findAll(specification, sortedPageable);
+
+        Page<TaskDto.response> taskDtos = tasks.map(task -> TaskDto.response.builder()
+                .id(task.getId())
+                .userId(userSecurity.getCurrentUserRole().equals("USER") ? null : task.getUser().getId())
+                .title(task.getTitle())
+                .description(task.getDescription())
+                .dueDate(task.getDueDate())
+                .status(task.getStatus())
+                .createdAt(task.getCreatedAt())
+                .build());
+
+        return taskDtos;
     }
 
     private Pageable createPageableWithSorting(Pageable pageable, String sortBy, String order) {
@@ -138,11 +146,12 @@ public class TaskServiceImplementation implements TaskService {
     @Override
     public TaskDto.response getById(Integer id) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " not found"));
-        if(userSecurity.getCurrentUserRole().equals("ROLE_USER") && !userSecurity.getCurrentUserId().equals(task.getUser().getId())) throw new UnauthorizedRoleException("you can't view other user's tasks");
+        if(userSecurity.getCurrentUserRole().equals("USER") && !userSecurity.getCurrentUserId().equals(task.getUser().getId())) throw new UnauthorizedRoleException("you can't view other user's tasks");
 
         return TaskDto.response.builder()
                 .title(task.getTitle())
                 .id(task.getId())
+                .userId(userSecurity.getCurrentUserRole().equals("USER") ? null : task.getUser().getId())
                 .createdAt(task.getCreatedAt())
                 .description(task.getDescription())
                 .dueDate(task.getDueDate())
@@ -153,7 +162,7 @@ public class TaskServiceImplementation implements TaskService {
     @Override
     public void delete(Integer id) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("task with id " + id + " not found"));
-        if(userSecurity.getCurrentUserRole().equals("ROLE_USER") && !userSecurity.getCurrentUserId().equals(task.getUser().getId())) throw new UnauthorizedRoleException("you can't delete other user's tasks");
+        if(userSecurity.getCurrentUserRole().equals("USER") && !userSecurity.getCurrentUserId().equals(task.getUser().getId())) throw new UnauthorizedRoleException("you can't delete other user's tasks");
 
         taskRepository.deleteById(id);
     }

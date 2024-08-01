@@ -36,7 +36,14 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/***").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users/").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/admin/users").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                        .requestMatchers("/api/admin/users/***").hasAnyRole("SUPER_ADMIN", "ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/admin/todos").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                        .requestMatchers("/api/admin/todos/***").hasAnyRole("SUPER_ADMIN", "ADMIN")
+
+                        .requestMatchers("/api/admin/super-admin").permitAll()
                         .requestMatchers("/").permitAll() // index
                         .anyRequest().authenticated()
                 )
@@ -51,7 +58,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthorizationManager<RequestAuthorizationContext> userAuthorizationManager() {
-        AuthorizationManager<RequestAuthorizationContext> adminAuth = AuthorityAuthorizationManager.hasRole("ADMIN");
+        AuthorizationManager<RequestAuthorizationContext> adminAuth = AuthorityAuthorizationManager.hasAnyRole("SUPER_ADMIN", "ADMIN");
         return (authentication, context) -> {
             if (adminAuth.check(authentication, context).isGranted()) {
                 return new AuthorizationDecision(true);

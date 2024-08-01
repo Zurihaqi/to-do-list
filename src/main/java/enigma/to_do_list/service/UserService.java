@@ -1,6 +1,7 @@
 package enigma.to_do_list.service;
 
 import enigma.to_do_list.model.User;
+import enigma.to_do_list.utils.dto.AuthDto;
 import enigma.to_do_list.utils.dto.UserDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,11 +13,13 @@ public interface UserService {
 
     void updatePassword(Integer id, String password);
 
-    void updateRole(Integer id, String role);
+    UserDto updateRole(Integer id, String role);
 
     Page<UserDto> getAll(Pageable pageable);
 
     UserDto getById(Integer id);
+
+    UserDto createSuperAdmin(AuthDto.RegisterRequest user);
 
     void delete(Integer id);
 }

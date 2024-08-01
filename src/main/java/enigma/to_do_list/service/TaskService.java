@@ -13,7 +13,7 @@ public interface TaskService {
 
     TaskDto.response updateStatus(Integer id, TaskDto.request task);
 
-    Page<Task> getAll(User user, Pageable pageable, String status, String sortBy, String order);
+    Page<TaskDto.response> getAll(User user, Pageable pageable, String status, String sortBy, String order);
 
     TaskDto.response getById(Integer id);
 

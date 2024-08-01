@@ -27,25 +27,13 @@ public class UserController {
         if(request.getUsername() != null) userService.updateName(id, request.getUsername());
         if(request.getEmail() != null) userService.updateEmail(id, request.getEmail());
         if(request.getPassword() != null) userService.updatePassword(id, request.getPassword());
-        if(request.getRole() != null) userService.updateRole(id, request.getRole().name());
 
         return new ResponseEntity<>(userService.getById(id), HttpStatus.OK);
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getAll(@PageableDefault Pageable pageable){
-        PageResponseWrapper<UserDto> response = new PageResponseWrapper<>(userService.getAll(pageable));
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/me")
     public ResponseEntity<?> getSelfProfile(@AuthenticationPrincipal User user){
         return new ResponseEntity<>(userService.getById(user.getId()), HttpStatus.OK);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id){
-        return new ResponseEntity<>(userService.getById(id), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

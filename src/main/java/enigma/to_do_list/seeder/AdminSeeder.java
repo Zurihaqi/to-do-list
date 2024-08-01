@@ -8,6 +8,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 @RequiredArgsConstructor
 @Component
 public class AdminSeeder implements CommandLineRunner {
@@ -33,7 +35,8 @@ public class AdminSeeder implements CommandLineRunner {
                         .email(adminEmail)
                         .username("Admin")
                         .password(passwordEncoder.encode(adminPassword))
-                        .role(User.Role.ROLE_ADMIN)
+                        .role(User.Role.SUPER_ADMIN)
+                        .createdAt(new Date())
                 .build()
         );
     }

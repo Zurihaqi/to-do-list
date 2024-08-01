@@ -20,6 +20,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImplementation implements AuthService {
@@ -44,7 +46,8 @@ public class AuthServiceImplementation implements AuthService {
                 .email(request.getEmail())
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(User.Role.ROLE_USER)
+                .role(User.Role.USER)
+                .createdAt(new Date())
                 .build();
 
         User savedUser = userRepository.save(user);
@@ -59,7 +62,7 @@ public class AuthServiceImplementation implements AuthService {
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         if(request.getEmail() == null || request.getEmail().isBlank() || request.getEmail().isEmpty()) throw new RuntimeException("email cannot be empty");
-        if(request.getPassword() == null || request.getPassword().isBlank() || request.getPassword().isEmpty()) throw new RuntimeException("email cannot be empty");
+        if(request.getPassword() == null || request.getPassword().isBlank() || request.getPassword().isEmpty()) throw new RuntimeException("password cannot be empty");
 
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new BadCredentialsException("invalid credentials"));
 
