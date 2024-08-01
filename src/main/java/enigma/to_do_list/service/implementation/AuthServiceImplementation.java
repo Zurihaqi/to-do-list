@@ -59,7 +59,7 @@ public class AuthServiceImplementation implements AuthService {
         if(request.getEmail().isBlank() || request.getEmail().isEmpty()) throw new RuntimeException("email cannot be empty");
         if(request.getPassword().isBlank() || request.getPassword().isEmpty()) throw new RuntimeException("email cannot be empty");
 
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new BadCredentialsException("invalid email or password"));
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new BadCredentialsException("invalid credentials"));
 
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -75,9 +75,9 @@ public class AuthServiceImplementation implements AuthService {
                         .accessToken(jwtService.generateToken(user))
                         .refreshToken(refreshToken.getToken())
                         .build();
-            } else throw new BadCredentialsException("invalid email or password");
+            } else throw new BadCredentialsException("invalid credentials");
         } catch (BadCredentialsException e){
-            throw new BadCredentialsException("invalid email or password");
+            throw new BadCredentialsException("invalid credentials");
         }
     }
 }
