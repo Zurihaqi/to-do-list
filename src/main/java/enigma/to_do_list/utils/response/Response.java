@@ -3,6 +3,7 @@ package enigma.to_do_list.utils.response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Response {
@@ -35,7 +36,7 @@ public class Response {
         WebResponseError<T> response = WebResponseError.<T>builder()
                 .message(message)
                 .status(httpStatus.getReasonPhrase())
-                .errors(List.of(ex.getMessage()))
+                .error(List.of(Arrays.toString(ex.getStackTrace())))
                 .build();
         return ResponseEntity.status(httpStatus).body(response);
     }

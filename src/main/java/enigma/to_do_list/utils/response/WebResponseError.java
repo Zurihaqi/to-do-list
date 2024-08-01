@@ -12,5 +12,5 @@ import java.util.List;
 public class WebResponseError<T> {
     private String message;
     private String status;
-    private List<String> errors;
+    private List<String> error;
 }
